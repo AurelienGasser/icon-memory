@@ -1,6 +1,6 @@
 {
   "name": "icon-memory",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "An awesome game.",
   "main": "index.js",
   "scripts": {
