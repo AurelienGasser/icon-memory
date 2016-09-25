@@ -20,7 +20,7 @@ function initTiles() {
   for (var k = 0; k < numIconsToUse; ++k) {
     iconsToUse.push([getRandomIcon(), 2]);
   }
-  
+
   for (var i = 0; i < mapWidth; ++i) {
     for (var j = 0; j < mapHeight; ++j) {
       var idx = Math.floor(Math.random() * Object.keys(iconsToUse).length);
@@ -42,34 +42,34 @@ function getRandomIcon() {
 }
 
 function setupExpress() {
-   express = require('express');
-   app = express();
-   http = require('http').Server(app);
-   io = require('socket.io')(http);
-   io.set('transports', ['websocket']);
+  express = require('express');
+  app = express();
+  http = require('http').Server(app);
+  io = require('socket.io')(http);
+  io.set('transports', ['websocket']);
 
-   app.use(express.static('public'));
+  app.use(express.static('public'));
 
-   http.listen(process.env.PORT || 3000, function () {
-     console.log('listening on *:3000');
-   });
+  http.listen(process.env.PORT || 3000, function() {
+    console.log('listening on *:3000');
+  });
 
-   io.on('connection', function (socket) {
-     sockets.push(socket);
-     socket.playerName = 'Player ' + Math.floor(Math.random() * 10000);
-     console.log('User connected');
-     sendGameState(socket);
-     
-     socket.on('send-info', function(data) {
-       socket.playerName = data.name;
-     })
-     
-     socket.on('disconnect', function () {
-       var idx = sockets.indexOf(socket);
-       if (idx != -1) sockets.splice(sockets, 1)
-       console.log(' User disconnected');
-     });
-   });
+  io.on('connection', function(socket) {
+    sockets.push(socket);
+    socket.playerName = 'Player ' + Math.floor(Math.random() * 10000);
+    console.log('User connected');
+    sendGameState(socket);
+
+    socket.on('send-info', function(data) {
+      socket.playerName = data.name;
+    });
+
+    socket.on('disconnect', function() {
+      var idx = sockets.indexOf(socket);
+      if (idx != -1) sockets.splice(sockets, 1)
+      console.log(' User disconnected');
+    });
+  });
 }
 
 function broadcast() {
@@ -81,8 +81,12 @@ function broadcast() {
 function sendGameState(socket) {
   socket.emit('game-state', {
     numPlayers: sockets.length,
-    players: sockets.map(function(s) { return { name: s.playerName }})
-  });  
+    players: sockets.map(function(s) {
+      return {
+        name: s.playerName
+      };
+    })
+  });
 }
 
 function readIcons(cb) {
