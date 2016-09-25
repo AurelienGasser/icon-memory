@@ -49,7 +49,8 @@ function setupExpress() {
 
    io.on('connection', function (socket) {
      sockets.push(socket);
-     socket.playerId = Math.floor(Math.random() * 10000);
+     var playerId = Math.floor(Math.random() * 10000);
+     socket.playerId = playerId;
      socket.playerName = 'Player ' + playerId;
      console.log('User connected');
      var gameState = getGameState();
@@ -85,6 +86,7 @@ function getGameState() {
   var players = {};
   
   for (var i = 0; i < sockets.length; ++i) {
+    var s = sockets[i];
     players[s.playerId] = { name: s.playerName };
   }
   
