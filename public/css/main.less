@@ -7,10 +7,10 @@ body, html{
 
 div[ng-controller="MainController"]{
   display: flex;
-      justify-content: center;
-    align-items: center;
-    height: 100%;
-    ul{
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  ul{
 
   }
 }
@@ -26,11 +26,9 @@ ul{
   padding: 0;
   position: relative;
 
-
-
   li{
-  
-  list-style: none;
+    
+    list-style: none;
     padding: 0;
     width: 100px;
     height: @h;
@@ -39,13 +37,13 @@ ul{
       border:1px solid black;
       text-align: center;
 
-  &:hover{
-    background-color: green;
-  }
-  
+      &:hover{
+        background-color: green;
+      }
+      
       i.fa{
         font-size: 32px;
-      line-height: @h - @margin * 2;
+        line-height: @h - @margin * 2;
       }
     }
   }

@@ -13,14 +13,13 @@
   <script type="text/javascript" src="js/main.js"></script>
   <!-- <link rel="stylesheet" type="text/css" href="css/main.css"> -->
 </head>
-<body>
   
 <body ng-app="myApp">
   <div ng-controller="MainController">
-  <div  style="width: {{o.width_container}}px">
+  <div  style="width: {{game.ui.widthContainer}}px">
     <ul>
-      <li ng-repeat="c in o.list" style="flex-basis: {{o.percentage}}%;">
-        <div ng-click="c.click()"><i class="fa fa-{{c.data.code}}"></i></div>
+      <li ng-repeat="c in game.cards" style="flex-basis: {{game.ui.percentage}}%;">
+        <div ng-click="c.click()"><i ng-if="c.data.icon !== null" class="fa fa-{{c.data.icon}}"></i></div>
       </li>
     </ul>
   </div>
