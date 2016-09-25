@@ -1,38 +1,31 @@
-var mapHeight = 5;
-var mapWidth = 10;
+var mapSize = 16;
 
 var express, app, http, io;
 var sockets = [];
 var icons;
-var tiles = [];
+var board = [];
 
 readIcons(function(err, _icons) {
   if (err) return;
   icons = _icons;
-  initTiles();
+  initBoard();
   setupExpress();
 });
 
-
-function initTiles() {
-  var numIconsToUse = mapWidth * mapHeight / 2;
+function initBoard() {
+  var numIconsToUse = mapSize / 2;
   var iconsToUse = [];
   for (var k = 0; k < numIconsToUse; ++k) {
     iconsToUse.push([getRandomIcon(), 2]);
   }
 
-  for (var i = 0; i < mapWidth; ++i) {
-    for (var j = 0; j < mapHeight; ++j) {
-      var idx = Math.floor(Math.random() * Object.keys(iconsToUse).length);
-      var o = iconsToUse[idx];
-      if (--o[1] == 0) {
-        iconsToUse.splice(idx, 1);
-      }
-      if (!tiles[i]) {
-        tiles[i] = [];
-      }
-      tiles[i].push(o[0]);
+  for (var i = 0; i < mapSize; ++i) {
+    var idx = Math.floor(Math.random() * Object.keys(iconsToUse).length);
+    var o = iconsToUse[idx];
+    if (--o[1] == 0) {
+      iconsToUse.splice(idx, 1);
     }
+    board.push({ icon: o[0] });
   }
 }
 
@@ -54,39 +47,59 @@ function setupExpress() {
     console.log('listening on *:3000');
   });
 
-  io.on('connection', function(socket) {
-    sockets.push(socket);
-    socket.playerName = 'Player ' + Math.floor(Math.random() * 10000);
-    console.log('User connected');
-    sendGameState(socket);
-
-    socket.on('send-info', function(data) {
-      socket.playerName = data.name;
-    });
-
-    socket.on('disconnect', function() {
-      var idx = sockets.indexOf(socket);
-      if (idx != -1) sockets.splice(sockets, 1)
-      console.log(' User disconnected');
-    });
-  });
+   io.on('connection', function (socket) {
+     sockets.push(socket);
+     var playerId = Math.floor(Math.random() * 10000);
+     socket.playerId = playerId;
+     socket.playerName = 'Player ' + playerId;
+     console.log('User connected');
+     var gameState = getGameState();
+     socket.emit('game-state', gameState);
+     
+     socket.on('send-info', function(data) {
+       socket.playerName = data.name;
+     })
+     
+     socket.on('disconnect', function () {
+       var idx = sockets.indexOf(socket);
+       if (idx != -1) sockets.splice(sockets, 1)
+       console.log('User disconnected');
+     });
+     
+     socket.on('card-turn', function(data) {
+       var obj = {
+         playerId: socket.playerId,
+         tile: data,
+         icon: board[data.id].icon
+       };       
+     });
+   });
 }
 
-function broadcast() {
+function broadcast(message, data) {
   for (var i = 0; i < sockets.length; ++i) {
-    sendGameState(sockets[i]);
-  };
+    sockets[i].emit(message, data);
+  };  
 }
 
-function sendGameState(socket) {
-  socket.emit('game-state', {
+function getGameState() {
+  var players = {};
+  
+  for (var i = 0; i < sockets.length; ++i) {
+    var s = sockets[i];
+    players[s.playerId] = { name: s.playerName };
+  }
+  
+  var gameState = {
     numPlayers: sockets.length,
-    players: sockets.map(function(s) {
-      return {
-        name: s.playerName
-      };
+    players: players,
+    board: board.map(function(t) { 
+      if (!t.player) return null;
+      return t; 
     })
-  });
+  };
+  
+  return gameState;
 }
 
 function readIcons(cb) {
