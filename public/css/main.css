@@ -1,0 +1,25 @@
+body {
+  margin: 0;
+  padding: 0;
+}
+ul {
+  margin: 0 auto;
+  display: flex;
+  flex-flow: row wrap;
+  margin: 0;
+  padding: 0;
+  position: relative;
+}
+ul li {
+  list-style: none;
+  padding: 0;
+  width: 50px;
+  height: 160px;
+  border: 0px solid black;
+}
+ul li div {
+  margin: 5px;
+  border: 1px solid blue;
+  text-align: center;
+  line-height: 150px;
+}
