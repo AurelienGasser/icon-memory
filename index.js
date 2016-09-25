@@ -3,7 +3,7 @@ var mapSize = 16;
 var express, app, http, io;
 var sockets = [];
 var icons;
-var board = [];
+var board;
 
 readIcons(function(err, _icons) {
   if (err) return;
@@ -13,6 +13,8 @@ readIcons(function(err, _icons) {
 });
 
 function initBoard() {
+  board = [];
+  
   var numIconsToUse = mapSize / 2;
   var iconsToUse = [];
   for (var k = 0; k < numIconsToUse; ++k) {
@@ -53,8 +55,7 @@ function setupExpress() {
      socket.playerId = playerId;
      socket.playerName = 'Player ' + playerId;
      console.log('User connected');
-     var gameState = getGameState();
-     socket.emit('game-state', gameState);
+     socket.emit('game-state', getGameState());
      
      socket.on('send-info', function(data) {
        socket.playerName = data.name;
@@ -66,14 +67,42 @@ function setupExpress() {
        console.log('User disconnected');
      });
      
-     socket.on('card-turn', function(data) {
+     socket.on('card-turn', function(data, cb) {
+       var icon = board[data.id].icon;
        var obj = {
          playerId: socket.playerId,
-         tile: data,
-         icon: board[data.id].icon
-       };       
+         tileId: data,
+         icon: icon
+       };
+       
+       if (!socket.previousTurn || socket.previousTurn.icon != icon) {
+         socket.previousTurn = obj;         
+       } else {
+         board[socket.previousTurn.tileId].player = socket.playerId;
+         board[obj.tileId].player = socket.playerId;
+         socket.previousTurn = null;
+         
+         var allTurned = true;
+         for (var i = 0; i < mapSize; ++i) {
+           if (board[i].player == null) {
+             allTurned = false;
+             break;
+           }
+         }
+         
+         if (allTurned) {
+           initBoard();
+         }
+       };
+       
+       cb(obj);
+       broadcast('game-state', getGameState())
      });
    });
+}
+
+function resetGame() {
+  
 }
 
 function broadcast(message, data) {
@@ -91,7 +120,6 @@ function getGameState() {
   }
   
   var gameState = {
-    numPlayers: sockets.length,
     players: players,
     board: board.map(function(t) { 
       if (!t.player) return null;
