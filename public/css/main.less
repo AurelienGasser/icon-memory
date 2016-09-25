@@ -1,15 +1,24 @@
-body{
+body, html{
   margin: 0;
   padding: 0;
+  height: 100%;
 
 }
 
-@h : 160px;
+div[ng-controller="MainController"]{
+  display: flex;
+      justify-content: center;
+    align-items: center;
+    height: 100%;
+    ul{
+
+  }
+}
+
+@h : 100px;
 @margin : 5px;
 
-
 ul{
-  // max-width: 600px;
   margin: 0 auto;
   display: flex;
   flex-flow: row wrap;
@@ -22,17 +31,22 @@ ul{
   li{
   
   list-style: none;
-    // margin: 5px;
     padding: 0;
-    width: 50px;
+    width: 100px;
     height: @h;
-    border:0px solid black;
     div{
       margin: @margin;
-      border:1px solid blue;
+      border:1px solid black;
       text-align: center;
-      line-height: @h - @margin * 2;
 
+  &:hover{
+    background-color: green;
+  }
+  
+      i.fa{
+        font-size: 32px;
+      line-height: @h - @margin * 2;
+      }
     }
   }
 }

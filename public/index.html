@@ -7,7 +7,7 @@
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.8/angular.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment.min.js"></script>
   <link rel="stylesheet/less" type="text/css" href="css/main.less" />
-
+  <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/less.js/2.7.1/less.min.js" type="text/javascript"></script>
   <script src="/socket.io/socket.io.js"></script>
   <script type="text/javascript" src="js/main.js"></script>
@@ -16,13 +16,14 @@
 <body>
   
 <body ng-app="myApp">
-
   <div ng-controller="MainController">
+  <div  style="width: {{o.width_container}}px">
     <ul>
       <li ng-repeat="c in o.list" style="flex-basis: {{o.percentage}}%;">
-        <div>{{c.id}}</div>
+        <div ng-click="c.click()"><i class="fa fa-{{c.data.code}}"></i></div>
       </li>
     </ul>
+  </div>
   </div>
 </body>
 

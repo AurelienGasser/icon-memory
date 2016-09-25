@@ -1,6 +1,14 @@
-body {
+body,
+html {
   margin: 0;
   padding: 0;
+  height: 100%;
+}
+div[ng-controller="MainController"] {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
 }
 ul {
   margin: 0 auto;
@@ -13,13 +21,18 @@ ul {
 ul li {
   list-style: none;
   padding: 0;
-  width: 50px;
-  height: 160px;
-  border: 0px solid black;
+  width: 100px;
+  height: 100px;
 }
 ul li div {
   margin: 5px;
-  border: 1px solid blue;
+  border: 1px solid black;
   text-align: center;
-  line-height: 150px;
+}
+ul li div:hover {
+  background-color: green;
+}
+ul li div i.fa {
+  font-size: 32px;
+  line-height: 90px;
 }
