@@ -4,7 +4,8 @@
   "description": "An awesome game.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
@@ -21,6 +22,11 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/momow/icon-memory/issues"
+  },
+  "dependencies": {
+    "colors": "^1.1.2",
+    "express": "^4.14.0",
+    "socket.io": "^1.4.8"
   },
   "homepage": "https://github.com/momow/icon-memory#readme"
 }
