@@ -3,7 +3,7 @@ var mapSize = 16;
 var express, app, http, io;
 var sockets = [];
 var icons;
-var board = [];
+var board;
 
 readIcons(function(err, _icons) {
   if (err) return;
@@ -13,6 +13,8 @@ readIcons(function(err, _icons) {
 });
 
 function initBoard() {
+  board = [];
+  
   var numIconsToUse = mapSize / 2;
   var iconsToUse = [];
   for (var k = 0; k < numIconsToUse; ++k) {
@@ -79,12 +81,28 @@ function setupExpress() {
          board[socket.previousTurn.tileId].player = socket.playerId;
          board[obj.tileId].player = socket.playerId;
          socket.previousTurn = null;
+         
+         var allTurned = true;
+         for (var i = 0; i < mapSize; ++i) {
+           if (board[i].player == null) {
+             allTurned = false;
+             break;
+           }
+         }
+         
+         if (allTurned) {
+           initBoard();
+         }
        };
        
        cb(obj);
        broadcast('game-state', getGameState())
      });
    });
+}
+
+function resetGame() {
+  
 }
 
 function broadcast(message, data) {
