@@ -95,7 +95,7 @@ function setupExpress() {
           board[obj.tileId].playerId = s.playerId;
           board[obj.tileId].temp = true;
           turnedTempTimeouts.push(setTimeout(function() {
-            if (!board[data.cardId].temp) {
+            if (board[data.cardId].temp) {
               board[data.cardId].playerId = null;
               board[data.cardId].temp = false;
               broadcastGameState();              
