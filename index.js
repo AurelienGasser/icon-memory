@@ -110,7 +110,7 @@ function setupExpress() {
         
           var allTurned = true;
           for (var i = 0; i < mapSize; ++i) {
-            if (board[i].player == null) {
+            if (board[i].playerId == null) {
               allTurned = false;
               break;
             }
