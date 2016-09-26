@@ -73,7 +73,7 @@ function setupExpress() {
 
     s.on('disconnect', function() {
       var idx = sockets.indexOf(s);
-      if (idx != -1) sockets.splice(socket, 1)
+      if (idx != -1) sockets.splice(s, 1)
       console.log('User disconnected');
     });
 
