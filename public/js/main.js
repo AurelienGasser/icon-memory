@@ -50,6 +50,7 @@
       percentage: 100 / count,
       widthContainer: 100 * count
     };
+    game.players = gameState.players;
     this.gameState = gameState;
     this.updateBoard();
   };
@@ -62,9 +63,8 @@
 
   game = new Game(socket);
 
-
-  Card = function(game, data) {
-    this.game = game;
+  Card = function(socket, data) {
+    this.socket = socket;
     this.data = data;
   };
 
