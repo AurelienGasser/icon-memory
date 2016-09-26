@@ -87,39 +87,48 @@ function setupExpress() {
       if (canTurn) {
         obj = {
           playerId: s.playerId,
-          tileId: data.cardId,
+          cardId: data.cardId,
           icon: icon
         };
-        if (!s.previousTurn || s.previousTurn.icon != icon) {
-          s.previousTurn = obj;
-          board[obj.tileId].playerId = s.playerId;
-          board[obj.tileId].temp = true;
-          turnedTempTimeouts.push(setTimeout(function() {
-            if (board[data.cardId].temp) {
+
+        if (!s.previousTurn) {
+          // first move
+          s.previousTurn = obj;          
+          board[obj.cardId].playerId = s.playerId;
+          board[obj.cardId].temp = true;
+        } else {
+          // second move
+          if (s.previousTurn.icon == icon) {
+            // yay!
+            board[s.previousTurn.cardId].playerId = s.playerId;
+            board[s.previousTurn.cardId].temp = false;
+            board[obj.cardId].playerId = s.playerId;
+            board[obj.cardId].temp = false;
+            s.previousTurn = null;
+            var allTurned = true;
+            for (var i = 0; i < mapSize; ++i) {
+              if (board[i].playerId == null) {
+                allTurned = false;
+                break;
+              }
+            }
+            if (allTurned) {
+              initBoard();
+            }
+          } else {
+            // nay!
+            board[obj.cardId].playerId = s.playerId;
+            board[obj.cardId].temp = true;
+            turnedTempTimeouts.push(setTimeout(function() {
+              board[s.previousTurn.cardId].playerId = null;
+              board[s.previousTurn.cardId].temp = false;
               board[data.cardId].playerId = null;
               board[data.cardId].temp = false;
-              broadcastGameState();              
-            }
-          }, 2000))
-        } else {
-          board[s.previousTurn.tileId].playerId = s.playerId;
-          board[s.previousTurn.tileId].temp = false;
-          board[obj.tileId].playerId = s.playerId;
-          board[obj.tileId].temp = false;
-          s.previousTurn = null;
-        
-          var allTurned = true;
-          for (var i = 0; i < mapSize; ++i) {
-            if (board[i].player == null) {
-              allTurned = false;
-              break;
-            }
+              s.previousTurn = null;
+              broadcastGameState();
+            }, 2000))
           }
-
-          if (allTurned) {
-            initBoard();
-          }
-        };
+        }
       }
       
       cb(obj);
@@ -145,7 +154,8 @@ function getGameState() {
     var s = sockets[i];
     players[s.playerId] = {
       name: s.playerName,
-      color: s.color
+      color: s.color,
+      playerId: s.playerId
     };
   }
 
