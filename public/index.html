@@ -17,14 +17,18 @@
     <div ng-controller="MainController">
       <div>
         <label>Player Name:</label>
-        <input type="text" ng-model="game.player.name">
+        <input type="text" ng-model="game.player.name" ng-change="game.savePlayer()">
+        <br>
+        <label>Color:</label>
+        <input type="color" ng-model="game.player.color" ng-change="game.savePlayer()">
+
       </div>
       <div class="board">
         <div  style="width: {{game.ui.widthContainer}}px">
           <ul>
             <li ng-repeat="(id, c) in game.cards" style="flex-basis: {{game.ui.percentage}}%;">
               <div ng-click="c.click()" class="animated" ng-class="{'flipInY' : c.data.icon !== null}">
-                <i ng-if="c.data.icon !== null" class="fa fa-{{c.data.icon}}"></i>
+                <i ng-if="c.data.icon !== null" class="fa fa-{{c.data.icon}}" style="color:{{c.color()}}"></i>
               </div>
             </li>
           </ul>

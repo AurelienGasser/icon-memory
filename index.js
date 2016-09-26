@@ -26,7 +26,7 @@ function initBoard() {
     iconsToUse.push([getRandomIcon(), 2]);
   }
 
-  for (var cardId = 0; i < mapSize; ++i) {
+  for (var cardId = 0; cardId < mapSize; ++cardId) {
     var idx = Math.floor(Math.random() * Object.keys(iconsToUse).length);
     var o = iconsToUse[idx];
     if (--o[1] == 0) {

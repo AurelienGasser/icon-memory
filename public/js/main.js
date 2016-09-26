@@ -6,20 +6,30 @@
   Game = function(socket) {
     this.socket = socket;
     this.cards = null;
+    this.player = {
+      name: localStorage.iconMemoryName || 'player' + Math.random(10),
+      color: localStorage.iconMemoryColor || '#ff00ff'
+    };
+  };
+
+  Game.prototype.savePlayer = function() {
+    localStorage.iconMemoryName = this.player.name;
+    localStorage.iconMemoryColor = this.player.color;
+    socket.emit('send-info', this.player);
   };
 
   Game.prototype.updateBoard = function() {
-    var i, c;
+    var i, c, card;
     if (this.cards === null) {
       this.cards = {};
       for (i = 0; i < this.gameState.board.length; i += 1) {
-        c = this.gameState.board;
-        // card = {
-        //   id: i,
-        //   icon: c && c.icon || null,
-        //   player: c && c.player || null
-        // };
-        this.cards[i] = new Card(this, c);
+        c = this.gameState.board[i];
+        card = {
+          id: i,
+          icon: c && c.icon || null,
+          player: c && c.player || null
+        };
+        this.cards[i] = new Card(this, card);
       }
     } else {
       console.log(this.gameState.board);
@@ -54,10 +64,14 @@
   game = new Game(socket);
 
 
-
-  Card = function(socket, data) {
-    this.socket = socket;
+  Card = function(game, data) {
+    this.game = game;
     this.data = data;
+  };
+
+  Card.prototype.color = function() {
+    var player = this.data.turn && game.gameState.player[this.data.turn];
+    return player && player.color || '#ff00ff';
   };
 
   Card.prototype.click = function() {
@@ -97,12 +111,9 @@
 
     socket.on('connect', function() {
       console.log('connected');
-      socket.emit('send-info', {
-        'name': 'pouya'
-      });
       $on('game-state', function(gameState) {
-        game.setGameState(gameState);
         console.log('gameState', gameState);
+        game.setGameState(gameState);
       });
     });
 
