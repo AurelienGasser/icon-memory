@@ -95,9 +95,11 @@ function setupExpress() {
           board[obj.tileId].playerId = s.playerId;
           board[obj.tileId].temp = true;
           turnedTempTimeouts.push(setTimeout(function() {
-            board[data.cardId].playerId = null;
-            board[data.cardId].temp = false;
-            broadcastGameState();
+            if (!board[data.cardId].temp) {
+              board[data.cardId].playerId = null;
+              board[data.cardId].temp = false;
+              broadcastGameState();              
+            }
           }, 2000))
         } else {
           board[s.previousTurn.tileId].playerId = s.playerId;
