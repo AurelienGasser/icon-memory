@@ -9,20 +9,28 @@
   };
 
   Game.prototype.updateBoard = function() {
-    var i;
+    var i, c;
     if (this.cards === null) {
       this.cards = {};
       for (i = 0; i < this.gameState.board.length; i += 1) {
-        this.cards[i] = new Card(this, {
-          id: i,
-          icon: null,
-          player: null
-        });
+        c = this.gameState.board;
+        // card = {
+        //   id: i,
+        //   icon: c && c.icon || null,
+        //   player: c && c.player || null
+        // };
+        this.cards[i] = new Card(this, c);
       }
     } else {
-      // for (i = 0; i < this.gameState.board.length; i += 1) {
-      //   this.cards[i].data = this.gameState.board[i];
-      // }
+      console.log(this.gameState.board);
+      for (i = 0; i < this.gameState.board.length; i += 1) {
+        c = this.gameState.board[i];
+        if (c !== null) {
+          this.cards[i].data.icon = this.gameState.board[i].icon;
+        } else {
+          this.cards[i].data.icon = null;
+        }
+      }
     }
     console.log(this.cards);
   };
@@ -50,7 +58,6 @@
   Card = function(socket, data) {
     this.socket = socket;
     this.data = data;
-    this.animate = false;
   };
 
   Card.prototype.click = function() {
@@ -58,9 +65,11 @@
     // that.data.icon = 'braille';
     console.log(that.data);
     $emit('card-turn', that.data, function(card) {
+      if (card === null) {
+        return console.log('card is null');
+      }
       console.log('card-turn', card);
       that.data.icon = card.icon;
-      that.animate = true;
     });
     console.log('click');
   };
