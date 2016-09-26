@@ -80,30 +80,31 @@ function setupExpress() {
     s.on('card-turn', function(data, cb) {
       console.log('card-turn', data);
       
-      var icon = board[data.cardId].icon;
-      var canTurn = !board[data.cardId].playerId;
-      var obj = null;
+      var cardId = data.cardId;
+      var card = board[cardId];
+      var icon = card.icon;
+      var canTurn = !card.playerId;
+      var obj = {
+            playerId: s.playerId,
+            cardId: cardId,
+            icon: icon,
+          };
       
-      if (canTurn) {
-        obj = {
-          playerId: s.playerId,
-          cardId: data.cardId,
-          icon: icon
-        };
+      if (canTurn && !s.waiting) {
+        console.log(obj)
 
         if (!s.previousTurn) {
-          // first move
-          s.previousTurn = obj;          
-          board[obj.cardId].playerId = s.playerId;
-          board[obj.cardId].temp = true;
+          // move #1
+          board[cardId].playerId = s.playerId;
+          board[cardId].temp = true;
+          s.previousTurn = obj; 
         } else {
-          // second move
+          // move #2
+          board[cardId].playerId = s.playerId;
           if (s.previousTurn.icon == icon) {
             // yay!
-            board[s.previousTurn.cardId].playerId = s.playerId;
             board[s.previousTurn.cardId].temp = false;
-            board[obj.cardId].playerId = s.playerId;
-            board[obj.cardId].temp = false;
+            board[cardId].temp = false;
             s.previousTurn = null;
             var allTurned = true;
             for (var i = 0; i < mapSize; ++i) {
@@ -117,22 +118,26 @@ function setupExpress() {
             }
           } else {
             // nay!
-            board[obj.cardId].playerId = s.playerId;
-            board[obj.cardId].temp = true;
-            turnedTempTimeouts.push(setTimeout(function() {
-              board[s.previousTurn.cardId].playerId = null;
-              board[s.previousTurn.cardId].temp = false;
-              board[data.cardId].playerId = null;
-              board[data.cardId].temp = false;
-              s.previousTurn = null;
-              broadcastGameState();
-            }, 2000))
+            board[cardId].temp = true;
+            s.waiting = true;
+            (function(_card) {
+              turnedTempTimeouts.push(setTimeout(function() {
+                s.waiting = false;
+                board[s.previousTurn.cardId].playerId = null;
+                board[s.previousTurn.cardId].temp = false;
+                _card.playerId = null;
+                _card.temp = false;
+                s.previousTurn = null;
+                broadcastGameState();
+              }, 2000))
+            })(card)
           }
         }
       }
       
+      obj.temp = card.temp;
       cb(obj);
-      broadcast('game-state', getGameState())
+      broadcastGameState();
     });
   });
 }

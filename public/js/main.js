@@ -98,6 +98,8 @@
       }
       console.log('card-turn', card);
       that.data.icon = card.icon;
+      console.log('card', card)
+      that.data.temp = card.temp;
     });
     console.log('click');
     this.doAnimation();
