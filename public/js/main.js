@@ -50,6 +50,7 @@
   Card = function(socket, data) {
     this.socket = socket;
     this.data = data;
+    this.animate = false;
   };
 
   Card.prototype.click = function() {
@@ -59,6 +60,7 @@
     $emit('card-turn', that.data, function(card) {
       console.log('card-turn', card);
       that.data.icon = card.icon;
+      that.animate = true;
     });
     console.log('click');
   };
