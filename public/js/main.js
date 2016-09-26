@@ -71,7 +71,7 @@
   };
 
   Card.prototype.color = function() {
-    var player = this.data.turn && game.gameState.player[this.data.playerId];
+    var player = this.data.playerId && game.gameState.players[this.data.playerId];
     console.log(player, this.data);
     return player && player.color || '#ff0000';
   };
