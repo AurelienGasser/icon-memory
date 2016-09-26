@@ -36,6 +36,7 @@ function initBoard() {
       icon: o[0],
       cardId: cardId
     });
+    console.log(board)
   }
 }
 
@@ -66,7 +67,7 @@ function setupExpress() {
     socket.emit('game-state', getGameState());
 
     socket.on('send-info', function(data) {
-      socket.playerName = data.name;
+      socket.playerName = data.playerName;
       socket.color = data.color;
     })
 
@@ -80,7 +81,7 @@ function setupExpress() {
       console.log('card-turn', data);
       
       var icon = board[data.cardId].icon;
-      var canTurn = !board[data.cardId].turnedTemp && !board[data.cardId].turned;
+      var canTurn = !board[data.cardId].playerId;
       var obj = null;
       
       if (canTurn) {
@@ -91,14 +92,18 @@ function setupExpress() {
         };
         if (!socket.previousTurn || socket.previousTurn.icon != icon) {
           socket.previousTurn = obj;
-          board[obj.tileId].turnedTemp = socket.playerId;
+          board[obj.tileId].playerId = socket.playerId;
+          board[obj.tileId].temp = true;
           turnedTempTimeouts.push(setTimeout(function() {
-            board[data.cardId].turnedTemp = null;
+            board[data.cardId].playerId = null;
+            board[data.cardId].temp = false;
             broadcastGameState();
           }, 2000))
         } else {
-          board[socket.previousTurn.tileId].turned = socket.playerId;
-          board[obj.tileId].turned = socket.playerId;
+          board[socket.previousTurn.tileId].playerId = socket.playerId;
+          board[socket.previousTurn.tileId].temp = false;
+          board[obj.tileId].playerId = socket.playerId;
+          board[obj.tileId].temp = false;
           socket.previousTurn = null;
         
           var allTurned = true;
@@ -144,7 +149,7 @@ function getGameState() {
   var gameState = {
     players: players,
     board: board.map(function(t) {
-      if (t.turnedTemp || t.turned) return t;
+      if (t.playerId) return t;
       return null;
     })
   };
