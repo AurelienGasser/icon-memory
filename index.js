@@ -73,7 +73,7 @@ function setupExpress() {
 
     s.on('disconnect', function() {
       var idx = sockets.indexOf(s);
-      if (idx != -1) sockets.splice(sockets, 1)
+      if (idx != -1) sockets.splice(socket, 1)
       console.log('User disconnected');
     });
 
@@ -95,7 +95,7 @@ function setupExpress() {
           board[obj.tileId].playerId = s.playerId;
           board[obj.tileId].temp = true;
           turnedTempTimeouts.push(setTimeout(function() {
-            if (!board[data.cardId].temp) {
+            if (board[data.cardId].temp) {
               board[data.cardId].playerId = null;
               board[data.cardId].temp = false;
               broadcastGameState();              
