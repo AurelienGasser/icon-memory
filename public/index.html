@@ -17,11 +17,12 @@
       <div  style="width: {{game.ui.widthContainer}}px">
         <ul>
           <li ng-repeat="(id, c) in game.cards" style="flex-basis: {{game.ui.percentage}}%;">
-            <div ng-click="c.click()"><i ng-if="c.data.icon !== null" class="fa fa-{{c.data.icon}}"></i>{{id}}</div>
+            <div ng-click="c.click()">
+              <i ng-if="c.data.icon !== null" class="fa fa-{{c.data.icon}}"></i>              
+            </div>
           </li>
         </ul>
       </div>
     </div>
   </body>
-</body>
 </html>

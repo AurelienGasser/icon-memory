@@ -27,7 +27,6 @@ ul{
   position: relative;
 
   li{
-    
     list-style: none;
     padding: 0;
     width: 100px;
@@ -36,11 +35,11 @@ ul{
       margin: @margin;
       border:1px solid black;
       text-align: center;
-
+      height: calc(100% - @margin * 2);
       &:hover{
         background-color: green;
       }
-      
+
       i.fa{
         font-size: 32px;
         line-height: @h - @margin * 2;

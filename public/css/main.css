@@ -28,6 +28,7 @@ ul li div {
   margin: 5px;
   border: 1px solid black;
   text-align: center;
+  height: calc(90%);
 }
 ul li div:hover {
   background-color: green;
