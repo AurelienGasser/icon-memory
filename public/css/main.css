@@ -27,13 +27,19 @@ ul li {
 ul li div {
   margin: 5px;
   border: 1px solid black;
+  border-radius: 10px;
   text-align: center;
   height: calc(90%);
 }
 ul li div:hover {
-  background-color: green;
+  background-color: #efefef;
 }
 ul li div i.fa {
   font-size: 32px;
   line-height: 90px;
+}
+div.players {
+  width: 500px;
+  height: 500px;
+  border: 1px solid black;
 }
