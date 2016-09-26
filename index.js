@@ -69,7 +69,8 @@ function setupExpress() {
     socket.on('send-info', function(data) {
       socket.playerName = data.playerName;
       socket.color = data.color;
-    })
+      broadcastGameState()
+    });
 
     socket.on('disconnect', function() {
       var idx = sockets.indexOf(socket);
