@@ -2,7 +2,7 @@
   'use strict';
   /*global io, angular, google, moment*/
 
-  var socket, app, game, Game, Card, $emit, $on;
+  var socket, app, game, Game, Card, $emit, $on, ngTimeout;
   Game = function(socket) {
     this.socket = socket;
     this.cards = null;
@@ -39,6 +39,9 @@
           this.cards[i].data.icon = this.gameState.board[i].icon;
           this.cards[i].data.playerId = this.gameState.board[i].playerId;
         } else {
+          if (this.cards[i].data.icon && this.cards[i].animate === false) {
+            this.cards[i].doAnimation();
+          }
           this.cards[i].data.icon = null;
         }
       }
@@ -68,6 +71,15 @@
   Card = function(socket, data) {
     this.socket = socket;
     this.data = data;
+    this.animate = false;
+  };
+
+  Card.prototype.doAnimation = function() {
+    var that = this;
+    this.animate = true;
+    ngTimeout(function() {
+      that.animate = false;
+    }, 250);
   };
 
   Card.prototype.color = function() {
@@ -88,10 +100,11 @@
       that.data.icon = card.icon;
     });
     console.log('click');
+    this.doAnimation();
   };
 
   app = angular.module('myApp', []);
-  app.controller('MainController', function($scope) {
+  app.controller('MainController', function($scope, $timeout) {
 
     game.$s = $scope;
     $scope.game = game;
@@ -112,6 +125,8 @@
         });
       });
     };
+
+    ngTimeout = $timeout;
 
     socket.on('connect', function() {
       console.log('connected');
