@@ -6,15 +6,16 @@
   Game = function(socket) {
     this.socket = socket;
     this.cards = null;
-    this.player = {
-      name: localStorage.iconMemoryName || 'player' + Math.random(10),
-      color: localStorage.iconMemoryColor || '#ff00ff'
+    this.player = localStorage.player || {
+      playerName: 'player' + Math.random(10),
+      color: '#ff00ff'
     };
   };
 
   Game.prototype.savePlayer = function() {
-    localStorage.iconMemoryName = this.player.name;
+    localStorage.iconMemoryName = this.player.playerName;
     localStorage.iconMemoryColor = this.player.color;
+    console.log('savePlayer', this.player);
     socket.emit('send-info', this.player);
   };
 
