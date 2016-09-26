@@ -26,14 +26,15 @@ function initBoard() {
     iconsToUse.push([getRandomIcon(), 2]);
   }
 
-  for (var i = 0; i < mapSize; ++i) {
+  for (var cardId = 0; i < mapSize; ++i) {
     var idx = Math.floor(Math.random() * Object.keys(iconsToUse).length);
     var o = iconsToUse[idx];
     if (--o[1] == 0) {
       iconsToUse.splice(idx, 1);
     }
     board.push({
-      icon: o[0]
+      icon: o[0],
+      id: cardId
     });
   }
 }
