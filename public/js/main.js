@@ -27,7 +27,8 @@
         c = this.gameState.board[i];
         card = {
           cardId: i,
-          icon: c && c.icon || null
+          icon: c && c.icon || null,
+          playerId: c && c.playerId || null
         };
         this.cards[i] = new Card(this, card);
       }
@@ -37,6 +38,7 @@
         c = this.gameState.board[i];
         if (c !== null) {
           this.cards[i].data.icon = this.gameState.board[i].icon;
+          this.cards[i].data.playerId = this.gameState.board[i].playerId;
         } else {
           this.cards[i].data.icon = null;
         }
@@ -72,7 +74,7 @@
   Card.prototype.color = function() {
     var player = this.data.turn && game.gameState.player[this.data.playerId];
     console.log(player, this.data);
-    return player && player.color || '#ff00ff';
+    return player && player.color || '#ff0000';
   };
 
   Card.prototype.click = function() {
