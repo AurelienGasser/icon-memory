@@ -30,8 +30,9 @@
         <div  style="width: {{game.ui.widthContainer}}px">
           <ul>
             <li ng-repeat="(id, c) in game.cards" style="flex-basis: {{game.ui.percentage}}%;">
-              <div ng-click="c.click()" class="animated" ng-class="{'flipInY' : c.animate === true}">
-                <i ng-if="c.data.icon !== null" ng-class="{temp:c.data.temp}" class="fa fa-{{c.data.icon}}" style="color:{{c.color()}}"></i>
+              <div ng-click="c.click()" class="animated" ng-class="{flipInY: c.animate === true, found: c.data.found}">
+                  {{c.data.temp === false}}  {{c.data.temp === true}}
+                <i ng-if="c.data.icon !== null" class="fa fa-{{c.data.icon}}" style="color:{{c.color()}}"></i>
               </div>
             </li>
           </ul>

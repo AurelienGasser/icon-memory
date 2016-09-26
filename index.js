@@ -78,20 +78,18 @@ function setupExpress() {
     });
 
     s.on('card-turn', function(data, cb) {
-      console.log('card-turn', data);
-      
       var cardId = data.cardId;
       var card = board[cardId];
       var icon = card.icon;
-      var canTurn = !card.playerId;
-      var obj = {
-            playerId: s.playerId,
-            cardId: cardId,
-            icon: icon,
-          };
+      var canTurn = !card.playerId && !s.waiting;
+      var obj = null;
       
-      if (canTurn && !s.waiting) {
-        console.log(obj)
+      if (canTurn) {
+        obj = {
+          playerId: s.playerId,
+          cardId: cardId,
+          icon: icon,
+        };
 
         if (!s.previousTurn) {
           // move #1
@@ -115,6 +113,7 @@ function setupExpress() {
             }
             if (allTurned) {
               initBoard();
+              broadcastGameState();
             }
           } else {
             // nay!
@@ -135,7 +134,6 @@ function setupExpress() {
         }
       }
       
-      obj.temp = card.temp;
       cb(obj);
       broadcastGameState();
     });
@@ -167,6 +165,7 @@ function getGameState() {
   var gameState = {
     players: players,
     board: board.map(function(card) {
+      card.found = card.temp === false;
       if (card.playerId) return card;
       return null;
     })

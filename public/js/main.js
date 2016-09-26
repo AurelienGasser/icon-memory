@@ -14,7 +14,6 @@
 
   Game.prototype.savePlayer = function() {
     localStorage.player = JSON.stringify(this.player);
-    console.log('savePlayer', this.player);
     socket.emit('send-info', this.player);
   };
 
@@ -27,26 +26,27 @@
         card = {
           cardId: i,
           icon: c && c.icon || null,
-          playerId: c && c.playerId || null
+          playerId: c && c.playerId || null,
+          found: c && c.found
         };
         this.cards[i] = new Card(this, card);
       }
     } else {
-      console.log(this.gameState.board);
       for (i = 0; i < this.gameState.board.length; i += 1) {
         c = this.gameState.board[i];
         if (c !== null) {
           this.cards[i].data.icon = this.gameState.board[i].icon;
           this.cards[i].data.playerId = this.gameState.board[i].playerId;
+          this.cards[i].data.found = this.gameState.board[i].found;
         } else {
           if (this.cards[i].data.icon && this.cards[i].animate === false) {
             this.cards[i].doAnimation();
           }
           this.cards[i].data.icon = null;
+          this.cards[i].data.found = false;
         }
       }
     }
-    console.log(this.cards);
   };
 
   Game.prototype.setGameState = function(gameState) {
@@ -84,25 +84,18 @@
 
   Card.prototype.color = function() {
     var player = this.data.playerId && game.gameState.players[this.data.playerId];
-    console.log(player, this.data);
     return player && player.color || '#ff0000';
   };
 
   Card.prototype.click = function() {
     var that = this;
-    // that.data.icon = 'braille';
-    console.log(that.data);
     $emit('card-turn', that.data, function(card) {
       if (card === null) {
-        return console.log('card is null');
+        return;
       }
-      console.log('card-turn', card);
-      that.data.icon = card.icon;
-      console.log('card', card)
-      that.data.temp = card.temp;
+      that.data.icon = card.icon;      
+      that.doAnimation();
     });
-    console.log('click');
-    this.doAnimation();
   };
 
   app = angular.module('myApp', []);
