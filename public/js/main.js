@@ -25,9 +25,8 @@
       for (i = 0; i < this.gameState.board.length; i += 1) {
         c = this.gameState.board[i];
         card = {
-          id: i,
-          icon: c && c.icon || null,
-          player: c && c.player || null
+          cardId: i,
+          icon: c && c.icon || null
         };
         this.cards[i] = new Card(this, card);
       }
@@ -70,7 +69,8 @@
   };
 
   Card.prototype.color = function() {
-    var player = this.data.turn && game.gameState.player[this.data.turn];
+    var player = this.data.turn && game.gameState.player[this.data.playerId];
+    console.log(player, this.data);
     return player && player.color || '#ff00ff';
   };
 
