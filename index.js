@@ -67,6 +67,7 @@ function setupExpress() {
 
     socket.on('send-info', function(data) {
       socket.playerName = data.name;
+      socket.color = data.color;
     })
 
     socket.on('disconnect', function() {
