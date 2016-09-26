@@ -2,8 +2,7 @@
   'use strict';
   /*global io, angular, google, moment*/
 
-  var socket, app, game, Game, Card;
-
+  var socket, app, game, Game, Card, $emit, $on;
   Game = function(socket) {
     this.socket = socket;
     this.cards = null;
@@ -21,9 +20,9 @@
         });
       }
     } else {
-      for (i = 0; i < this.gameState.board.length; i += 1) {
-        this.cards[i].data = this.gameState.board[i];
-      }
+      // for (i = 0; i < this.gameState.board.length; i += 1) {
+      //   this.cards[i].data = this.gameState.board[i];
+      // }
     }
     console.log(this.cards);
   };
@@ -55,22 +54,32 @@
 
   Card.prototype.click = function() {
     var that = this;
-    that.data.icon = 'braille';
-    // this.socket.emit('card-turn', this.data.id, function(card) {
-    //   that.data.icon = card.icon;
-    // });
+    // that.data.icon = 'braille';
+    console.log(that.data);
+    $emit('card-turn', that.data, function(card) {
+      console.log('card-turn', card);
+      that.data.icon = card.icon;
+    });
     console.log('click');
   };
 
   app = angular.module('myApp', []);
   app.controller('MainController', function($scope) {
+
     game.$s = $scope;
     $scope.game = game;
 
-    var $on = function(key, callback) {
+    $on = function(key, callback) {
       socket.on(key, function(res) {
         $scope.$apply(function() {
           return callback(res);
+        });
+      });
+    };
+    $emit = function(key, data, callback) {
+      socket.emit(key, data, function(res) {
+        $scope.$apply(function() {
+          return callback && callback(res);
         });
       });
     };

@@ -14,7 +14,7 @@ readIcons(function(err, _icons) {
 
 function initBoard() {
   board = [];
-  
+
   var numIconsToUse = mapSize / 2;
   var iconsToUse = [];
   for (var k = 0; k < numIconsToUse; ++k) {
@@ -27,7 +27,9 @@ function initBoard() {
     if (--o[1] == 0) {
       iconsToUse.splice(idx, 1);
     }
-    board.push({ icon: o[0] });
+    board.push({
+      icon: o[0]
+    });
   }
 }
 
@@ -49,84 +51,87 @@ function setupExpress() {
     console.log('listening on *:3000');
   });
 
-   io.on('connection', function (socket) {
-     sockets.push(socket);
-     var playerId = Math.floor(Math.random() * 10000);
-     socket.playerId = playerId;
-     socket.playerName = 'Player ' + playerId;
-     console.log('User connected');
-     socket.emit('game-state', getGameState());
-     
-     socket.on('send-info', function(data) {
-       socket.playerName = data.name;
-     })
-     
-     socket.on('disconnect', function () {
-       var idx = sockets.indexOf(socket);
-       if (idx != -1) sockets.splice(sockets, 1)
-       console.log('User disconnected');
-     });
-     
-     socket.on('card-turn', function(data, cb) {
-       var icon = board[data.id].icon;
-       var obj = {
-         playerId: socket.playerId,
-         tileId: data,
-         icon: icon
-       };
-       
-       if (!socket.previousTurn || socket.previousTurn.icon != icon) {
-         socket.previousTurn = obj;         
-       } else {
-         board[socket.previousTurn.tileId].player = socket.playerId;
-         board[obj.tileId].player = socket.playerId;
-         socket.previousTurn = null;
-         
-         var allTurned = true;
-         for (var i = 0; i < mapSize; ++i) {
-           if (board[i].player == null) {
-             allTurned = false;
-             break;
-           }
-         }
-         
-         if (allTurned) {
-           initBoard();
-         }
-       };
-       
-       cb(obj);
-       broadcast('game-state', getGameState())
-     });
-   });
+  io.on('connection', function(socket) {
+    sockets.push(socket);
+    var playerId = Math.floor(Math.random() * 10000);
+    socket.playerId = playerId;
+    socket.playerName = 'Player ' + playerId;
+    console.log('User connected');
+    socket.emit('game-state', getGameState());
+
+    socket.on('send-info', function(data) {
+      socket.playerName = data.name;
+    })
+
+    socket.on('disconnect', function() {
+      var idx = sockets.indexOf(socket);
+      if (idx != -1) sockets.splice(sockets, 1)
+      console.log('User disconnected');
+    });
+
+    socket.on('card-turn', function(data, cb) {
+      console.log('card-turn', data);
+      var icon = board[data.id].icon;
+      var obj = {
+        playerId: socket.playerId,
+        tileId: data,
+        icon: icon
+      };
+
+      if (!socket.previousTurn || socket.previousTurn.icon != icon) {
+        socket.previousTurn = obj;
+      } else {
+        board[socket.previousTurn.tileId].player = socket.playerId;
+        board[obj.tileId].player = socket.playerId;
+        socket.previousTurn = null;
+
+        var allTurned = true;
+        for (var i = 0; i < mapSize; ++i) {
+          if (board[i].player == null) {
+            allTurned = false;
+            break;
+          }
+        }
+
+        if (allTurned) {
+          initBoard();
+        }
+      };
+
+      cb(obj);
+      broadcast('game-state', getGameState())
+    });
+  });
 }
 
 function resetGame() {
-  
+
 }
 
 function broadcast(message, data) {
   for (var i = 0; i < sockets.length; ++i) {
     sockets[i].emit(message, data);
-  };  
+  };
 }
 
 function getGameState() {
   var players = {};
-  
+
   for (var i = 0; i < sockets.length; ++i) {
     var s = sockets[i];
-    players[s.playerId] = { name: s.playerName };
+    players[s.playerId] = {
+      name: s.playerName
+    };
   }
-  
+
   var gameState = {
     players: players,
-    board: board.map(function(t) { 
+    board: board.map(function(t) {
       if (!t.player) return null;
-      return t; 
+      return t;
     })
   };
-  
+
   return gameState;
 }
 
