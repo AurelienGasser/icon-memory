@@ -69,7 +69,8 @@ function setupExpress() {
     socket.on('send-info', function(data) {
       socket.playerName = data.playerName;
       socket.color = data.color;
-    })
+      broadcastGameState()
+    });
 
     socket.on('disconnect', function() {
       var idx = sockets.indexOf(socket);
@@ -148,8 +149,8 @@ function getGameState() {
 
   var gameState = {
     players: players,
-    board: board.map(function(t) {
-      if (t.playerId) return t;
+    board: board.map(function(card) {
+      if (card.playerId) return card;
       return null;
     })
   };

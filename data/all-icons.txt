@@ -1,5 +1,4 @@
 500px
-Examples
 adjust
 adn
 align-center

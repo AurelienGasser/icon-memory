@@ -31,7 +31,7 @@
           <ul>
             <li ng-repeat="(id, c) in game.cards" style="flex-basis: {{game.ui.percentage}}%;">
               <div ng-click="c.click()" class="animated" ng-class="{'flipInY' : c.data.icon !== null}">
-                <i ng-if="c.data.icon !== null" class="fa fa-{{c.data.icon}}" style="color:{{c.color()}}"></i>
+                <i ng-if="c.data.icon !== null" class="fa fa-{{c.data.icon}} card-temp-{{c.data.temp}}" style="color:{{c.color()}}"></i>
               </div>
             </li>
           </ul>
