@@ -16,7 +16,7 @@
   <body ng-app="myApp">
     <div ng-controller="MainController">
     <div>
-      <div ng-repeat="(playerId,p) in game.gameState.players"><span style="color:p.color">{{p.name}}</span></div>
+      <div ng-repeat="(playerId,p) in game.gameState.players"><span style="color:{{p.color}}">{{p.name}}</span></div>
     </div>
 
       <div>
