@@ -34,7 +34,7 @@ function initBoard() {
     }
     board.push({
       icon: o[0],
-      id: cardId
+      cardId: cardId
     });
   }
 }
