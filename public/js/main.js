@@ -96,6 +96,8 @@
     game.$s = $scope;
     $scope.game = game;
 
+    game.savePlayer();
+
     $on = function(key, callback) {
       socket.on(key, function(res) {
         $scope.$apply(function() {
