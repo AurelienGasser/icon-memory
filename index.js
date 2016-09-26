@@ -144,7 +144,8 @@ function getGameState() {
   for (var i = 0; i < sockets.length; ++i) {
     var s = sockets[i];
     players[s.playerId] = {
-      name: s.playerName
+      name: s.playerName,
+      color: s.color
     };
   }
 
