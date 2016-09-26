@@ -74,7 +74,7 @@ function setupExpress() {
       var icon = board[data.id].icon;
       var obj = {
         playerId: socket.playerId,
-        tileId: data,
+        tileId: data.id,
         icon: icon
       };
 
