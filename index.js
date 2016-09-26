@@ -72,8 +72,18 @@ function setupExpress() {
     });
 
     s.on('disconnect', function() {
+      // turn all cards owned by player
+      for (var i = 0; i < board.length; ++i) {
+        var card = board[i];
+        if (card.playerId == s.playerId) {
+          card.playerId = null;
+          card.temp = false;
+        }
+      }
+      
       var idx = sockets.indexOf(s);
       if (idx != -1) sockets.splice(s, 1)
+      broadcastGameState();
       console.log('User disconnected');
     });
 
