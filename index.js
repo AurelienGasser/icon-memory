@@ -36,7 +36,6 @@ function initBoard() {
       icon: o[0],
       cardId: cardId
     });
-    console.log(board)
   }
 }
 
