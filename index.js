@@ -36,7 +36,6 @@ function initBoard() {
       icon: o[0],
       cardId: cardId
     });
-    console.log(board)
   }
 }
 
@@ -58,27 +57,27 @@ function setupExpress() {
     console.log('listening on *:3000');
   });
 
-  io.on('connection', function(socket) {
-    sockets.push(socket);
+  io.on('connection', function(s) {
+    sockets.push(s);
     var playerId = Math.floor(Math.random() * 10000);
-    socket.playerId = playerId;
-    socket.playerName = 'Player ' + playerId;
+    s.playerId = playerId;
+    s.playerName = 'Player ' + playerId;
     console.log('User connected');
-    socket.emit('game-state', getGameState());
+    s.emit('game-state', getGameState());
 
-    socket.on('send-info', function(data) {
-      socket.playerName = data.playerName;
-      socket.color = data.color;
+    s.on('send-info', function(data) {
+      s.playerName = data.playerName;
+      s.color = data.color;
       broadcastGameState()
     });
 
-    socket.on('disconnect', function() {
-      var idx = sockets.indexOf(socket);
+    s.on('disconnect', function() {
+      var idx = sockets.indexOf(s);
       if (idx != -1) sockets.splice(sockets, 1)
       console.log('User disconnected');
     });
 
-    socket.on('card-turn', function(data, cb) {
+    s.on('card-turn', function(data, cb) {
       console.log('card-turn', data);
       
       var icon = board[data.cardId].icon;
@@ -87,13 +86,13 @@ function setupExpress() {
       
       if (canTurn) {
         obj = {
-          playerId: socket.playerId,
+          playerId: s.playerId,
           tileId: data.cardId,
           icon: icon
         };
-        if (!socket.previousTurn || socket.previousTurn.icon != icon) {
-          socket.previousTurn = obj;
-          board[obj.tileId].playerId = socket.playerId;
+        if (!s.previousTurn || s.previousTurn.icon != icon) {
+          s.previousTurn = obj;
+          board[obj.tileId].playerId = s.playerId;
           board[obj.tileId].temp = true;
           turnedTempTimeouts.push(setTimeout(function() {
             board[data.cardId].playerId = null;
@@ -101,11 +100,11 @@ function setupExpress() {
             broadcastGameState();
           }, 2000))
         } else {
-          board[socket.previousTurn.tileId].playerId = socket.playerId;
-          board[socket.previousTurn.tileId].temp = false;
-          board[obj.tileId].playerId = socket.playerId;
+          board[s.previousTurn.tileId].playerId = s.playerId;
+          board[s.previousTurn.tileId].temp = false;
+          board[obj.tileId].playerId = s.playerId;
           board[obj.tileId].temp = false;
-          socket.previousTurn = null;
+          s.previousTurn = null;
         
           var allTurned = true;
           for (var i = 0; i < mapSize; ++i) {
