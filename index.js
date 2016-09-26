@@ -80,11 +80,12 @@ function setupExpress() {
 
       if (!socket.previousTurn || socket.previousTurn.icon != icon) {
         socket.previousTurn = obj;
+        board[obj.tileId].turnedTemp = socket.playerId
       } else {
-        board[socket.previousTurn.tileId].player = socket.playerId;
-        board[obj.tileId].player = socket.playerId;
+        board[socket.previousTurn.tileId].turned = socket.playerId;
+        board[obj.tileId].turned = socket.playerId;
         socket.previousTurn = null;
-
+        
         var allTurned = true;
         for (var i = 0; i < mapSize; ++i) {
           if (board[i].player == null) {
@@ -127,8 +128,8 @@ function getGameState() {
   var gameState = {
     players: players,
     board: board.map(function(t) {
-      if (!t.player) return null;
-      return t;
+      if (t.turnedTemp || t.turned) return t;
+      return null;
     })
   };
 
