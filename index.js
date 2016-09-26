@@ -4,6 +4,7 @@ var express, app, http, io;
 var sockets = [];
 var icons;
 var board;
+var turnedTempTimeouts = [];
 
 readIcons(function(err, _icons) {
   if (err) return;
@@ -14,6 +15,10 @@ readIcons(function(err, _icons) {
 
 function initBoard() {
   board = [];
+  
+  for (var j = 0; j < turnedTempTimeouts.length; ++j) {
+    clearTimeout(turnedTempTimeouts[j]);
+  }
 
   var numIconsToUse = mapSize / 2;
   var iconsToUse = [];
@@ -71,42 +76,51 @@ function setupExpress() {
 
     socket.on('card-turn', function(data, cb) {
       console.log('card-turn', data);
+      
       var icon = board[data.id].icon;
-      var obj = {
-        playerId: socket.playerId,
-        tileId: data.id,
-        icon: icon
-      };
-
-      if (!socket.previousTurn || socket.previousTurn.icon != icon) {
-        socket.previousTurn = obj;
-        board[obj.tileId].turnedTemp = socket.playerId
-      } else {
-        board[socket.previousTurn.tileId].turned = socket.playerId;
-        board[obj.tileId].turned = socket.playerId;
-        socket.previousTurn = null;
+      var canTurn = !board[data.id].turnedTemp && !board[data.id].turned;
+      var obj = null;
+      
+      if (canTurn) {
+        obj = {
+          playerId: socket.playerId,
+          tileId: data.id,
+          icon: icon
+        };
+        if (!socket.previousTurn || socket.previousTurn.icon != icon) {
+          socket.previousTurn = obj;
+          board[obj.tileId].turnedTemp = socket.playerId;
+          turnedTempTimeouts.push(setTimeout(function() {
+            board[data.id].turnedTemp = null;
+            broadcastGameState();
+          }, 2000))
+        } else {
+          board[socket.previousTurn.tileId].turned = socket.playerId;
+          board[obj.tileId].turned = socket.playerId;
+          socket.previousTurn = null;
         
-        var allTurned = true;
-        for (var i = 0; i < mapSize; ++i) {
-          if (board[i].player == null) {
-            allTurned = false;
-            break;
+          var allTurned = true;
+          for (var i = 0; i < mapSize; ++i) {
+            if (board[i].player == null) {
+              allTurned = false;
+              break;
+            }
           }
-        }
 
-        if (allTurned) {
-          initBoard();
-        }
-      };
-
+          if (allTurned) {
+            initBoard();
+          }
+        };
+      }
+      
       cb(obj);
       broadcast('game-state', getGameState())
     });
   });
 }
 
-function resetGame() {
-
+function broadcastGameState() {
+  broadcast('game-state', getGameState());
 }
 
 function broadcast(message, data) {
