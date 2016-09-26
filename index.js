@@ -149,8 +149,8 @@ function getGameState() {
 
   var gameState = {
     players: players,
-    board: board.map(function(t) {
-      if (t.playerId) return t;
+    board: board.map(function(card) {
+      if (card.playerId) return card;
       return null;
     })
   };
