@@ -78,21 +78,21 @@ function setupExpress() {
     socket.on('card-turn', function(data, cb) {
       console.log('card-turn', data);
       
-      var icon = board[data.id].icon;
-      var canTurn = !board[data.id].turnedTemp && !board[data.id].turned;
+      var icon = board[data.cardId].icon;
+      var canTurn = !board[data.cardId].turnedTemp && !board[data.cardId].turned;
       var obj = null;
       
       if (canTurn) {
         obj = {
           playerId: socket.playerId,
-          tileId: data.id,
+          tileId: data.cardId,
           icon: icon
         };
         if (!socket.previousTurn || socket.previousTurn.icon != icon) {
           socket.previousTurn = obj;
           board[obj.tileId].turnedTemp = socket.playerId;
           turnedTempTimeouts.push(setTimeout(function() {
-            board[data.id].turnedTemp = null;
+            board[data.cardId].turnedTemp = null;
             broadcastGameState();
           }, 2000))
         } else {
