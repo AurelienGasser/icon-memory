@@ -1,4 +1,5 @@
-var mapSize = 16;
+var mapSize = 36;
+// var mapSize = 16;
 
 var express, app, http, io;
 var sockets = [];
@@ -6,7 +7,7 @@ var icons;
 var board;
 var turnedTempTimeouts = [];
 
-readIcons(function(err, _icons) {
+readIcons(function (err, _icons) {
   if (err) return;
   icons = _icons;
   initBoard();
@@ -15,7 +16,7 @@ readIcons(function(err, _icons) {
 
 function initBoard() {
   board = [];
-  
+
   for (var j = 0; j < turnedTempTimeouts.length; ++j) {
     clearTimeout(turnedTempTimeouts[j]);
   }
@@ -53,11 +54,11 @@ function setupExpress() {
 
   app.use(express.static('public'));
 
-  http.listen(process.env.PORT || 3000, function() {
+  http.listen(process.env.PORT || 3000, function () {
     console.log('listening on *:3000');
   });
 
-  io.on('connection', function(s) {
+  io.on('connection', function (s) {
     sockets.push(s);
     var playerId = Math.floor(Math.random() * 10000);
     s.playerId = playerId;
@@ -65,13 +66,13 @@ function setupExpress() {
     console.log('User connected');
     s.emit('game-state', getGameState());
 
-    s.on('send-info', function(data) {
+    s.on('send-info', function (data) {
       s.playerName = data.playerName;
       s.color = data.color;
-      broadcastGameState()
+      broadcastGameState();
     });
 
-    s.on('disconnect', function() {
+    s.on('disconnect', function () {
       // turn all cards owned by player
       for (var i = 0; i < board.length; ++i) {
         var card = board[i];
@@ -80,20 +81,24 @@ function setupExpress() {
           card.temp = false;
         }
       }
-      
+
       var idx = sockets.indexOf(s);
-      if (idx != -1) sockets.splice(s, 1)
+      if (idx != -1) sockets.splice(s, 1);
       broadcastGameState();
       console.log('User disconnected');
     });
+    s.on('reset', (data, cb) => {
+      initBoard();
+      broadcastGameState();
+    });
 
-    s.on('card-turn', function(data, cb) {
+    s.on('card-turn', function (data, cb) {
       var cardId = data.cardId;
       var card = board[cardId];
       var icon = card.icon;
       var canTurn = !card.playerId && !s.waiting;
       var obj = null;
-      
+
       if (canTurn) {
         obj = {
           playerId: s.playerId,
@@ -105,7 +110,7 @@ function setupExpress() {
           // move #1
           board[cardId].playerId = s.playerId;
           board[cardId].temp = true;
-          s.previousTurn = obj; 
+          s.previousTurn = obj;
         } else {
           // move #2
           board[cardId].playerId = s.playerId;
@@ -129,8 +134,8 @@ function setupExpress() {
             // nay!
             board[cardId].temp = true;
             s.waiting = true;
-            (function(_card) {
-              turnedTempTimeouts.push(setTimeout(function() {
+            (function (_card) {
+              turnedTempTimeouts.push(setTimeout(function () {
                 s.waiting = false;
                 board[s.previousTurn.cardId].playerId = null;
                 board[s.previousTurn.cardId].temp = false;
@@ -138,12 +143,12 @@ function setupExpress() {
                 _card.temp = false;
                 s.previousTurn = null;
                 broadcastGameState();
-              }, 2000))
-            })(card)
+              }, 2000));
+            })(card);
           }
         }
       }
-      
+
       cb(obj);
       broadcastGameState();
     });
@@ -157,24 +162,35 @@ function broadcastGameState() {
 function broadcast(message, data) {
   for (var i = 0; i < sockets.length; ++i) {
     sockets[i].emit(message, data);
-  };
+  }
+}
+
+function getPlayerCount(board, playerId) {
+  return board.filter(c => c.playerId === playerId && c.found === true).length;
 }
 
 function getGameState() {
   var players = {};
+  const scores = [];
 
   for (var i = 0; i < sockets.length; ++i) {
     var s = sockets[i];
-    players[s.playerId] = {
+    const player = {
       name: s.playerName,
       color: s.color,
-      playerId: s.playerId
+      playerId: s.playerId,
+      count: getPlayerCount(board, s.playerId)
     };
+    players[s.playerId] = player;
+    scores.push(player);
   }
+
+  scores.sort((a, b) => b.count - a.count);
 
   var gameState = {
     players: players,
-    board: board.map(function(card) {
+    scores,
+    board: board.map(function (card) {
       card.found = card.temp === false;
       if (card.playerId) return card;
       return null;
@@ -185,7 +201,7 @@ function getGameState() {
 }
 
 function readIcons(cb) {
-  require('fs').readFile('data/all-icons.txt', 'utf-8', function(err, content) {
+  require('fs').readFile('data/all-icons.txt', 'utf-8', function (err, content) {
     if (err) {
       console.log('Cannot load icons: ', err);
       cb(err);

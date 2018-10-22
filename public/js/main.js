@@ -1,9 +1,9 @@
-(function() {
+(function () {
   'use strict';
   /*global io, angular, google, moment*/
 
   var socket, app, game, Game, Card, $emit, $on, ngTimeout;
-  Game = function(socket) {
+  Game = function (socket) {
     this.socket = socket;
     this.cards = null;
     this.player = localStorage.player && JSON.parse(localStorage.player) || {
@@ -12,12 +12,12 @@
     };
   };
 
-  Game.prototype.savePlayer = function() {
+  Game.prototype.savePlayer = function () {
     localStorage.player = JSON.stringify(this.player);
     socket.emit('send-info', this.player);
   };
 
-  Game.prototype.updateBoard = function() {
+  Game.prototype.updateBoard = function () {
     var i, c, card;
     if (this.cards === null) {
       this.cards = {};
@@ -49,7 +49,7 @@
     }
   };
 
-  Game.prototype.setGameState = function(gameState) {
+  Game.prototype.setGameState = function (gameState) {
     var count = Math.sqrt(gameState.board.length);
     game.ui = {
       percentage: 100 / count,
@@ -68,54 +68,58 @@
 
   game = new Game(socket);
 
-  Card = function(socket, data) {
+  Card = function (socket, data) {
     this.socket = socket;
     this.data = data;
     this.animate = false;
   };
 
-  Card.prototype.doAnimation = function() {
+  Card.prototype.doAnimation = function () {
     var that = this;
     this.animate = true;
-    ngTimeout(function() {
+    ngTimeout(function () {
       that.animate = false;
     }, 250);
   };
 
-  Card.prototype.color = function() {
+  Card.prototype.color = function () {
     var player = this.data.playerId && game.gameState.players[this.data.playerId];
     return player && player.color || '#ff0000';
   };
 
-  Card.prototype.click = function() {
+  Card.prototype.click = function () {
     var that = this;
-    $emit('card-turn', that.data, function(card) {
+    $emit('card-turn', that.data, function (card) {
       if (card === null) {
         return;
       }
-      that.data.icon = card.icon;      
+      that.data.icon = card.icon;
       that.doAnimation();
     });
   };
 
   app = angular.module('myApp', []);
-  app.controller('MainController', function($scope, $timeout) {
+  app.controller('MainController', function ($scope, $timeout) {
 
     game.$s = $scope;
     $scope.game = game;
 
+    $scope.reset = () => {
+      $emit('reset');
+    };
+
     game.savePlayer();
 
-    $on = function(key, callback) {
-      socket.on(key, function(res) {
-        $scope.$apply(function() {
+    $on = function (key, callback) {
+      socket.on(key, function (res) {
+        $scope.$apply(function () {
           return callback(res);
         });
       });
     };
-    $emit = function(key, data, callback) {
-      socket.emit(key, data, function(res) {
-        $scope.$apply(function() {
+    $emit = function (key, data, callback) {
+      socket.emit(key, data, function (res) {
+        $scope.$apply(function () {
           return callback && callback(res);
         });
       });
@@ -123,9 +127,9 @@
 
     ngTimeout = $timeout;
 
-    socket.on('connect', function() {
+    socket.on('connect', function () {
       console.log('connected');
-      $on('game-state', function(gameState) {
+      $on('game-state', function (gameState) {
         console.log('gameState', gameState);
         game.setGameState(gameState);
       });
