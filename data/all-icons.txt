@@ -52,11 +52,6 @@ bar-chart
 bar-chart-o
 barcode
 bars
-battery-0
-battery-1
-battery-2
-battery-3
-battery-4
 battery-empty
 battery-full
 battery-half

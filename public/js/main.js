@@ -103,6 +103,7 @@
 
     game.$s = $scope;
     $scope.game = game;
+    $scope.lastWinner = '';
 
     $scope.reset = () => {
       $emit('reset');
@@ -131,6 +132,7 @@
       console.log('connected');
       $on('game-state', function (gameState) {
         console.log('gameState', gameState);
+        $scope.lastWinner = gameState.scores[0] && gameState.scores[0].name;
         game.setGameState(gameState);
       });
     });

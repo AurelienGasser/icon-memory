@@ -18,10 +18,10 @@
 <body ng-app="myApp">
   <div ng-controller="MainController">
     <div>
+      <div ng-if="game.gameState.lastWinner">champion:{{game.gameState.lastWinner}}</div>
       <div ng-repeat="p in game.gameState.scores"><span style="color:{{p.color}}">{{p.name}}
           - {{p.count}}</span></div>
     </div>
-
     <div>
       <label>Player Name:</label>
       <input type="text" ng-model="game.player.playerName" ng-change="game.savePlayer()">
